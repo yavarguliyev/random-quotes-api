@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { getErrorMessage } from '../utils/utility-functions.util';
-import { QuotableQuoteSchema } from '../value-objects/schemas';
+import { QuotableQuoteSchema } from '../value-objects/validation-schemas';
 import { Quote, QuoteResponse } from '../value-objects/types';
 
 export class QuoteService {
