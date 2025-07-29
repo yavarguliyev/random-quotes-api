@@ -1,4 +1,4 @@
-# Quote Service
+# Random Quotes API
 
 A production-ready quote service built with Fastify, TypeScript, and GraphQL that provides both REST and GraphQL APIs for fetching and interacting with random quotes.
 
@@ -33,7 +33,7 @@ A production-ready quote service built with Fastify, TypeScript, and GraphQL tha
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd quote-service
+cd random-quotes-api
 
 # Install dependencies
 npm install
