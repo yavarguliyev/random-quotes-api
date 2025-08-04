@@ -8,7 +8,12 @@
     "type-check": "tsc --noEmit",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/index.js",
+    "pm2:status": "pm2 status",
+    "pm2:clean": "pm2 delete all && pm2 save --force && pm2 status",
+    "pm2:dev": "pm2 start ecosystem.dev.config.js",
+    "pm2:stop": "pm2 stop all",
+    "pm2:restart": "pm2 restart all"
   },
   "keywords": [
     "quotes",
@@ -24,13 +29,17 @@
     "fastify": "^4.24.3",
     "graphql": "^16.8.1",
     "mercurius": "^13.3.3",
+    "pg": "^8.16.3",
     "pino": "^8.16.2",
+    "pm2": "^6.0.8",
+    "psql": "^0.0.1",
+    "typeorm": "^0.3.25",
     "winston": "^3.17.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/winston": "^2.4.4",
     "@types/node": "^20.9.0",
+    "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.54.0",

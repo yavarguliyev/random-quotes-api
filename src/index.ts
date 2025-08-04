@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import mercurius from 'mercurius';
 import dotenv from 'dotenv';
+import cluster from 'cluster';
+import os from 'os';
 
 import resolvers from './graphql/resolvers';
 import routes from './routes';
@@ -13,7 +15,7 @@ dotenv.config();
 
 const fastify = Fastify({ logger: false });
 
-async function buildServer () {
+async function buildServer() {
   await fastify.register(mercurius, { schema, resolvers, graphiql: true });
   await routes(fastify, services);
 
@@ -57,20 +59,36 @@ async function buildServer () {
 }
 
 async function start() {
-  try {
-    const server = await buildServer();
-    const port = parseInt(process.env.PORT!);
-    const host = process.env.HOST;
+  const numCPUs = os.cpus().length / 4;
 
-    await server.listen({ port, host });
+  if (cluster.isPrimary) {
+    logger.info(`🔧 Master ${process.pid} is running`);
+    logger.info(`🚀 Starting ${numCPUs} workers...`);
 
-    logger.info(`🚀 Quote Service running at http://${host}:${port}`);
-    logger.info(`📊 GraphQL Playground available at http://${host}:${port}/graphiql`);
-    logger.info(`🏥 Health check at http://${host}:${port}/health`);
-  } catch (error) {
-    logger.error('Error starting server:', getErrorMessage(error));
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
 
-    process.exit(1);
+    cluster.on('exit', (worker, code, signal) => {
+      logger.info(`Worker ${worker.process.pid} died with code: ${code}, signal: ${signal}`);
+      cluster.fork();
+    });
+  } else {
+    try {
+      const server = await buildServer();
+      const port = parseInt(process.env.PORT!);
+      const host = process.env.HOST;
+
+      await server.listen({ port, host });
+
+      logger.info(`🚀 Quote Service running at http://${host}:${port}`);
+      logger.info(`📊 GraphQL Playground available at http://${host}:${port}/graphiql`);
+      logger.info(`🏥 Health check at http://${host}:${port}/health`);
+    } catch (error) {
+      logger.error('Error starting server:', getErrorMessage(error));
+
+      process.exit(1);
+    }
   }
 }
 
